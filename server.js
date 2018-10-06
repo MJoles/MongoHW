@@ -12,8 +12,6 @@ var Article = require("./models/Article.js");
 var request = require("request");
 var cheerio = require("cheerio");
 
-mongoose.Promise = Promise;
-
 //Port 3000
 var port = process.env.PORT || 3000
 
@@ -38,8 +36,14 @@ app.engine("handlebars", exphbs({
 }));
 app.set("view engine", "handlebars");
 
-// Database configuration with mongoose
-mongoose.connect("mongodb://localhost/mongoHeadlines");
+// If deployed, use the deployed database. Otherwise use the local mongoHeadlines database
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
+
+// Set mongoose to leverage built in JavaScript ES6 Promises
+// Connect to the Mongo DB
+mongoose.Promise = Promise;
+mongoose.connect(MONGODB_URI);
+
 //mongoose.connect("mongodb://localhost/mongoscraper");
 var db = mongoose.connection;
 
