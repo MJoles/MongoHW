@@ -83,25 +83,27 @@ app.get("/saved", function(req, res) {
 // A GET request to scrape the NYTimes website
 app.get("/scrape", function(req, res) {
   
-  axios.get("https://www.nytimes.com/").then(function(response) {
+  axios.get("https://www.dailyherald.com/").then(function(response) {
    
     var $ = cheerio.load(response.data);
     // Grab all h2 within an article tag
-    $("article h2").each(function (i, element) {
+    $(".secStoryBoxOdd").each(function (i, element) {
      
       var result = {};
-
+      console.log(result)
       // Add the title and summary of every link, and save them as properties of the result object
       result.title = $(this)
-        .children("a")
+        .find(".secStoryHed")
         .text();
-        console.log("title" + this)
+        console.log("this is title: " + result.title)
       result.summary = $(this)
-        .children(".summary")
+        .find("span")
         .text();
+        console.log("this is summary: " + result.summary)
       result.link = $(this)
         .children("a")
         .attr("href");
+        console.log("this is link: " + result.link)
 
       // Using our Article model, create a new entry
       // This effectively passes the result object to the entry (and the title and link)
@@ -111,13 +113,13 @@ app.get("/scrape", function(req, res) {
       Article.create(result)
         .then(function(articleDb) {
           console.log(articleDb)
-          res.send("Scrape Complete");
         })
         .catch(function(err) {
           res.json(err)
+          console.log(err)
         })
       });
-      
+      res.send("Scrape Complete");
     });
   });
   // Tell the browser that we finished scraping the text
